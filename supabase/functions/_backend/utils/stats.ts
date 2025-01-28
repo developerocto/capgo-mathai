@@ -32,9 +32,9 @@ export function createStatsVersion(c: Context, version_id: number, app_id: strin
   return trackVersionUsageCF(c, version_id, app_id, action)
 }
 
-export function createStatsLogs(c: Context, app_id: string, device_id: string, action: Database['public']['Enums']['stats_action'], version_id: number) {
+export function createStatsLogs(c: Context, app_id: string, device_id: string, action: Database['public']['Enums']['stats_action'], version_id: number, device: DeviceWithoutCreatedAt) {
   if (!c.env.APP_LOG)
-    return trackLogsSB(c, app_id, device_id, action, version_id)
+    return trackLogsSB(c, app_id, device_id, action, version_id, device)
   return trackLogsCF(c, app_id, device_id, action, version_id)
 }
 
@@ -98,7 +98,7 @@ export function sendStatsAndDevice(c: Context, device: DeviceWithoutCreatedAt, s
   const jobs = []
   // Prepare the stats data for insertion
   statsActions.forEach(({ action, versionId }) => {
-    jobs.push(createStatsLogs(c, device.app_id, device.device_id, action, versionId ?? device.version))
+    jobs.push(createStatsLogs(c, device.app_id, device.device_id, action, versionId ?? device.version, device))
   })
 
   // if any statsActions is get, then we need the device data

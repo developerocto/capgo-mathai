@@ -151,6 +151,12 @@ async function post(c: Context, body: AppStats) {
     }
     const statsActions: StatsActions[] = []
 
+    const { data: deviceInfo } = await supabaseAdmin(c)
+      .from('devices')
+      .select('device_id, custom_id')
+      .eq('device_id', device_id)
+      .single()
+
     const { data: appVersion } = await supabaseAdmin(c)
       .from('app_versions')
       .select('id, owner_org')
